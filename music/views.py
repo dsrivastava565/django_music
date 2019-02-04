@@ -10,12 +10,13 @@ def index(request):
 
 
 def details(request):
-    if request.method == 'GET':
-
-        art = request.GET['artist']
-        query = list(Album.objects.filter(artist=art).values('artist', 'album_title', 'genre', 'album_logo'))
-        status = 200
-        return JsonResponse(data=query, status=200, safe=False)
+    if request.method == 'GET'and 'artist' in request.GET:
+        q = request.GET['artist']
+        if q is not None and q != '':   
+            query = list(Album.objects.filter(artist=q).values('artist', 'album_title', 'genre', 'album_logo'))
+            status = 200
+            return JsonResponse(data=query, status=200, safe=False)
+        
     elif request.method == 'POST':
         input_data = json.loads(request.body)
         check_artisst = input_data['artist']
@@ -28,7 +29,10 @@ def details(request):
             insert_music = Album.objects.create(artist=input_data['artist'], album_title=input_data['album_title'],
                                                 genre=input_data['genre'], album_logo=input_data['album_logo'])
             return JsonResponse({'msg': 'success'})
-
+    else:
+            query = list(Album.objects.values('artist', 'album_title', 'genre', 'album_logo'))
+            status = 200
+            return JsonResponse(data=query, status=200, safe=False)
 
 def song(request):
     if request.method == 'GET':
